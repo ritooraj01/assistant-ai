@@ -1,4 +1,4 @@
-# Trading Assistant 📈
+# Assistant 📈
 
 A comprehensive, real-time trading analysis platform for Indian stock markets (NIFTY, BANKNIFTY) featuring advanced technical analysis, ML predictions, options analytics, and multi-factor signal generation.
 
@@ -466,4 +466,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Built with ❤️ for Indian traders | Star ⭐ this repo if you find it useful!**
+**Made with ❤️ for my personal use!**
