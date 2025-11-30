@@ -1,0 +1,238 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+</head>
+<body>
+
+<div class="app-wrapper">
+    
+    <header class="app-header">
+        <div class="header-left">
+            <span class="logo-icon"></span>
+            <span class="logo-text">Trading Assistant</span>
+        </div>
+        <div class="header-right">
+            <div class="current-symbol-badge" id="currentSymbolBadge" title="Currently viewing symbol">NIFTY 50</div>
+            <div class="timeframe-selector">
+                <button class="tf-btn active" data-interval="1">1m</button>
+                <button class="tf-btn" data-interval="3">3m</button>
+                <button class="tf-btn" data-interval="5">5m</button>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard-layout-3col">
+        
+        <aside class="left-sidebar">
+            
+            <div class="sidebar-card nifty-card active-symbol" id="niftyCard" title="Click to switch to NIFTY 50">
+                <div class="nifty-header">
+                    <h3 class="sidebar-title">📊 NIFTY 50</h3>
+                    <div class="active-dot"></div>
+                </div>
+                <div class="nifty-price-section">
+                    <div class="nifty-price" id="niftyPrice">--</div>
+                    <div class="nifty-change" id="niftyChange">--</div>
+                </div>
+                <div class="nifty-mini-chart" id="niftyMiniChart"></div>
+            </div>
+
+            <div class="sidebar-card">
+                <h3 class="sidebar-title">🌍 India Impact Markets</h3>
+                <div class="global-list">
+                    <div class="global-item">
+                        <span class="global-name">GIFT Nifty</span>
+                        <span class="global-value" id="giftnifty">--</span>
+                    </div>
+                    <div class="global-item">
+                        <span class="global-name">Nasdaq Futures</span>
+                        <span class="global-value" id="nasdaq">--</span>
+                    </div>
+                    <div class="global-item">
+                        <span class="global-name">Crude Oil</span>
+                        <span class="global-value" id="crude">--</span>
+                    </div>
+                    <div class="global-item">
+                        <span class="global-name">USD/INR</span>
+                        <span class="global-value" id="usdinr">--</span>
+                    </div>
+                    <div class="global-item">
+                        <span class="global-name">SGX Nifty</span>
+                        <span class="global-value" id="sgxnifty">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-card">
+                <h3 class="sidebar-title">🎯 Market Regime</h3>
+                <div class="regime-display" id="regimeDisplay">
+                    <div class="regime-label">Current: <span id="regimeValue">--</span></div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill" id="regimeConfidence" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-card">
+                <h3 class="sidebar-title"> Options Signal</h3>
+                <div class="options-summary">
+                    <div class="pcr-display">
+                        <span class="pcr-label">PCR:</span>
+                        <span class="pcr-value" id="pcrValue">--</span>
+                    </div>
+                    <div class="oi-change">
+                        <span class="oi-label">OI Trend:</span>
+                        <span class="oi-value" id="oiTrend">--</span>
+                    </div>
+                </div>
+            </div>
+
+        </aside>
+
+        <main class="center-analysis">
+
+            <div class="main-action-card" id="mainAction">
+                <div class="action-symbol-label" id="actionSymbolLabel">NIFTY 50</div>
+                <div class="action-title" id="actionTitle">WAIT</div>
+                <div class="action-meta">
+                    <div class="action-confidence">
+                        <span class="meta-label">Confidence:</span>
+                        <span class="meta-value" id="actionConfidence">0%</span>
+                    </div>
+                    <div class="action-trend">
+                        <span class="meta-label">ML Trend:</span>
+                        <span class="meta-value" id="mlTrend">--</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-section">
+                <div class="chart-header">
+                    <h2 class="section-title"> Price Chart</h2>
+                    <div class="price-label" id="priceLabel">--</div>
+                </div>
+                <div class="main-chart" id="mainChart" style="border: 2px solid #667eea; min-height: 400px;">
+                    <div style="color: #888; padding: 180px 20px; text-align: center; font-size: 14px;">
+                        📊 Loading chart...
+                    </div>
+                </div>
+            </div>
+
+            <div class="predictions-section">
+                <h2 class="section-title"> ML Predictions</h2>
+                <div class="predictions-grid">
+                    <div class="prediction-card">
+                        <div class="pred-label">LSTM</div>
+                        <div class="pred-value" id="lstmPred">--</div>
+                    </div>
+                    <div class="prediction-card">
+                        <div class="pred-label">GRU</div>
+                        <div class="pred-value" id="gruPred">--</div>
+                    </div>
+                    <div class="prediction-card">
+                        <div class="pred-label">Transformer</div>
+                        <div class="pred-value" id="transformerPred">--</div>
+                    </div>
+                    <div class="prediction-card">
+                        <div class="pred-label">Ensemble</div>
+                        <div class="pred-value" id="ensemblePred">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="reasoning-section">
+                <h2 class="section-title"> Signal Reasoning</h2>
+                <div class="reasoning-content">
+                    <div class="reason-item">
+                        <span class="reason-icon"></span>
+                        <span class="reason-text" id="reason1">Analyzing...</span>
+                    </div>
+                    <div class="reason-item">
+                        <span class="reason-icon"></span>
+                        <span class="reason-text" id="reason2">Processing...</span>
+                    </div>
+                    <div class="reason-item">
+                        <span class="reason-icon"></span>
+                        <span class="reason-text" id="reason3">Evaluating...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="market-overview">
+                <h2 class="section-title"> Technical Overview</h2>
+                <div class="overview-grid">
+                    <div class="overview-item">
+                        <div class="overview-label">RSI (14)</div>
+                        <div class="overview-value" id="rsiValue">--</div>
+                    </div>
+                    <div class="overview-item">
+                        <div class="overview-label">ATR</div>
+                        <div class="overview-value" id="atrValue">--</div>
+                    </div>
+                    <div class="overview-item">
+                        <div class="overview-label">MACD</div>
+                        <div class="overview-value" id="macdValue">--</div>
+                    </div>
+                    <div class="overview-item">
+                        <div class="overview-label">Bollinger %</div>
+                        <div class="overview-value" id="bbValue">--</div>
+                    </div>
+                    <div class="overview-item">
+                        <div class="overview-label">Volume Trend</div>
+                        <div class="overview-value" id="volumeTrend">--</div>
+                    </div>
+                    <div class="overview-item">
+                        <div class="overview-label">Momentum</div>
+                        <div class="overview-value" id="momentum">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="headlines-section">
+                <h2 class="section-title"> Market Headlines</h2>
+                <div class="headlines-list" id="headlinesList">
+                    <div class="headline-item">Loading...</div>
+                </div>
+            </div>
+
+        </main>
+
+        <aside class="right-sidebar">
+            <div class="stocks-panel">
+                <div class="stocks-header">
+                    <h3 class="stocks-title"> Stocks</h3>
+                    <button class="drawer-close-btn" id="drawerCloseBtn"></button>
+                </div>
+                
+                <div class="sector-tabs" id="sectorTabs">
+                    <button class="sector-tab active" data-sector="all">All</button>
+                    <button class="sector-tab" data-sector="banks">Banks</button>
+                    <button class="sector-tab" data-sector="it">IT</button>
+                    <button class="sector-tab" data-sector="pharma">Pharma</button>
+                    <button class="sector-tab" data-sector="auto">Auto</button>
+                    <button class="sector-tab" data-sector="fmcg">FMCG</button>
+                    <button class="sector-tab" data-sector="financial">Financial</button>
+                    <button class="sector-tab" data-sector="energy">Energy</button>
+                    <button class="sector-tab" data-sector="infra">Infra</button>
+                </div>
+                
+                <div class="stocks-grid" id="stocksGrid"></div>
+            </div>
+        </aside>
+
+    </div>
+
+    <button class="floating-stocks-btn" id="floatingStocksBtn"> Stocks</button>
+    <div class="drawer-backdrop" id="drawerBackdrop"></div>
+
+</div>
+
+<script src="script.js?v=1732896456"></script>
+
+</body>
+</html>

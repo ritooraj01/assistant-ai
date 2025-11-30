@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend Fixes Verification</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 { color: #667eea; }
+        h2 { color: #22c55e; margin-top: 30px; }
+        .test-section {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .test-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+        .test-item:last-child {
+            border-bottom: none;
+        }
+        .status {
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+        .pass { background: #22c55e; color: #000; }
+        .fail { background: #ef4444; color: #fff; }
+        .pending { background: #fbbf24; color: #000; }
+        button {
+            background: #667eea;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin: 5px;
+        }
+        button:hover { background: #5568d3; }
+        #console {
+            background: #0f0f0f;
+            border: 1px solid #2a2a2a;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+        .log { margin: 5px 0; }
+        .log.success { color: #22c55e; }
+        .log.error { color: #ef4444; }
+        .log.info { color: #667eea; }
+        .log.warn { color: #fbbf24; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Frontend Fixes Verification Dashboard</h1>
+    <p>This page tests all 9 fixes applied to the trading dashboard.</p>
+
+    <div class="test-section">
+        <h2>🚀 Quick Actions</h2>
+        <button onclick="runAllTests()">Run All Tests</button>
+        <button onclick="testBackendConnection()">Test Backend</button>
+        <button onclick="testStockAPI()">Test Stock API</button>
+        <button onclick="clearConsole()">Clear Console</button>
+        <button onclick="window.location.href='index.html'">Open Main Dashboard</button>
+    </div>
+
+    <div class="test-section">
+        <h2>📋 Test Results</h2>
+        <div id="testResults"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>📊 Console Output</h2>
+        <div id="console"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:8000';
+        let testResults = [];
+
+        function log(message, type = 'info') {
+            const console = document.getElementById('console');
+            const log = document.createElement('div');
+            log.className = `log ${type}`;
+            log.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            console.appendChild(log);
+            console.scrollTop = console.scrollHeight;
+        }
+
+        function clearConsole() {
+            document.getElementById('console').innerHTML = '';
+        }
+
+        function updateResults() {
+            const resultsDiv = document.getElementById('testResults');
+            resultsDiv.innerHTML = testResults.map(test => `
+                <div class="test-item">
+                    <span>${test.name}</span>
+                    <span class="status ${test.status}">${test.status.toUpperCase()}</span>
+                </div>
+            `).join('');
+        }
+
+        function addTestResult(name, status) {
+            const existing = testResults.findIndex(t => t.name === name);
+            if (existing >= 0) {
+                testResults[existing].status = status;
+            } else {
+                testResults.push({ name, status });
+            }
+            updateResults();
+        }
+
+        async function testBackendConnection() {
+            log('Testing backend connection...', 'info');
+            addTestResult('Backend Connection', 'pending');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/health`);
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ Backend healthy: ${JSON.stringify(data)}`, 'success');
+                    addTestResult('Backend Connection', 'pass');
+                    return true;
+                } else {
+                    log(`❌ Backend returned ${response.status}`, 'error');
+                    addTestResult('Backend Connection', 'fail');
+                    return false;
+                }
+            } catch (error) {
+                log(`❌ Backend connection failed: ${error.message}`, 'error');
+                log('💡 Make sure backend is running: uvicorn main:app --reload', 'warn');
+                addTestResult('Backend Connection', 'fail');
+                return false;
+            }
+        }
+
+        async function testNiftyAPI() {
+            log('Testing NIFTY API...', 'info');
+            addTestResult('NIFTY API', 'pending');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/signal_live?symbol=NIFTY&interval=300&limit=50`);
+                const data = await response.json();
+                
+                if (data.price && data.price > 0) {
+                    log(`✅ NIFTY price: ₹${data.price}`, 'success');
+                    log(`   Signal: ${data.signal?.action} (${Math.round((data.signal?.confidence || 0) * 100)}%)`, 'info');
+                    log(`   ML enabled: ${data.ml_view?.enabled}`, 'info');
+                    log(`   ML trend: ${data.ml_view?.trend_label}`, 'info');
+                    addTestResult('NIFTY API', 'pass');
+                    return data;
+                } else {
+                    log(`❌ Invalid NIFTY data: ${JSON.stringify(data).substring(0, 100)}`, 'error');
+                    addTestResult('NIFTY API', 'fail');
+                    return null;
+                }
+            } catch (error) {
+                log(`❌ NIFTY API failed: ${error.message}`, 'error');
+                addTestResult('NIFTY API', 'fail');
+                return null;
+            }
+        }
+
+        async function testStockAPI() {
+            log('Testing individual stock API...', 'info');
+            addTestResult('Stock API', 'pending');
+            
+            const stocks = ['HDFCBANK', 'INFY', 'RELIANCE'];
+            let passCount = 0;
+            
+            for (const symbol of stocks) {
+                try {
+                    const response = await fetch(`${API_BASE}/api/signal_live?symbol=${symbol}&interval=300&limit=10`);
+                    const data = await response.json();
+                    
+                    if (data.price && data.price > 0) {
+                        log(`✅ ${symbol}: ₹${data.price}`, 'success');
+                        passCount++;
+                    } else {
+                        log(`❌ ${symbol}: Invalid data`, 'error');
+                    }
+                } catch (error) {
+                    log(`❌ ${symbol}: ${error.message}`, 'error');
+                }
+                
+                // Small delay between requests
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+            
+            if (passCount === stocks.length) {
+                addTestResult('Stock API', 'pass');
+            } else if (passCount > 0) {
+                addTestResult('Stock API', 'pending');
+            } else {
+                addTestResult('Stock API', 'fail');
+            }
+        }
+
+        async function testMLPredictions() {
+            log('Testing ML predictions per symbol...', 'info');
+            addTestResult('ML Predictions', 'pending');
+            
+            try {
+                // Test NIFTY
+                const niftyResponse = await fetch(`${API_BASE}/api/signal_live?symbol=NIFTY&interval=300&limit=50`);
+                const niftyData = await niftyResponse.json();
+                
+                // Test BANKNIFTY
+                const bnResponse = await fetch(`${API_BASE}/api/signal_live?symbol=BANKNIFTY&interval=300&limit=50`);
+                const bnData = await bnResponse.json();
+                
+                const niftyML = niftyData.ml_view;
+                const bnML = bnData.ml_view;
+                
+                if (niftyML && bnML) {
+                    log(`✅ NIFTY ML: ${niftyML.trend_label} (score: ${niftyML.final_ml_score})`, 'success');
+                    log(`✅ BANKNIFTY ML: ${bnML.trend_label} (score: ${bnML.final_ml_score})`, 'success');
+                    
+                    // Check if they're different (they should be unless by coincidence)
+                    if (niftyML.final_ml_score !== bnML.final_ml_score) {
+                        log(`✅ ML predictions are symbol-specific (different scores)`, 'success');
+                        addTestResult('ML Predictions', 'pass');
+                    } else {
+                        log(`⚠️ ML predictions identical (might be coincidence)`, 'warn');
+                        addTestResult('ML Predictions', 'pending');
+                    }
+                } else {
+                    log(`❌ ML data missing`, 'error');
+                    addTestResult('ML Predictions', 'fail');
+                }
+            } catch (error) {
+                log(`❌ ML test failed: ${error.message}`, 'error');
+                addTestResult('ML Predictions', 'fail');
+            }
+        }
+
+        async function testPriceCalculation() {
+            log('Testing NIFTY price % calculation...', 'info');
+            addTestResult('Price % Calculation', 'pending');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/signal_live?symbol=NIFTY&interval=300&limit=50`);
+                const data = await response.json();
+                
+                if (data.candles && data.candles.length >= 2) {
+                    const dayOpen = data.candles[0].open;
+                    const currentPrice = data.price || data.candles[data.candles.length - 1].close;
+                    const changePercent = ((currentPrice - dayOpen) / dayOpen) * 100;
+                    
+                    log(`✅ Day open: ₹${dayOpen.toFixed(2)}`, 'success');
+                    log(`   Current: ₹${currentPrice.toFixed(2)}`, 'info');
+                    log(`   Change: ${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}%`, 'info');
+                    
+                    // Reasonable intraday range check
+                    if (Math.abs(changePercent) < 10) {
+                        log(`✅ Change % is reasonable (${changePercent.toFixed(2)}%)`, 'success');
+                        addTestResult('Price % Calculation', 'pass');
+                    } else {
+                        log(`⚠️ Change % seems high (${changePercent.toFixed(2)}%) - verify`, 'warn');
+                        addTestResult('Price % Calculation', 'pending');
+                    }
+                } else {
+                    log(`❌ Insufficient candle data`, 'error');
+                    addTestResult('Price % Calculation', 'fail');
+                }
+            } catch (error) {
+                log(`❌ Price calculation test failed: ${error.message}`, 'error');
+                addTestResult('Price % Calculation', 'fail');
+            }
+        }
+
+        async function testGlobalCues() {
+            log('Testing GIFT/SGX Nifty data...', 'info');
+            addTestResult('GIFT/SGX Nifty', 'pending');
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/signal_live?symbol=NIFTY&interval=300&limit=10`);
+                const data = await response.json();
+                
+                if (data.global && data.global.data) {
+                    const gift = data.global.data.gift_nifty;
+                    const sgx = data.global.data.sgx_nifty;
+                    
+                    if (gift) {
+                        const proxyLabel = gift.proxy ? ' (PROXY)' : '';
+                        log(`✅ GIFT Nifty: ${gift.last}${proxyLabel}`, gift.proxy ? 'warn' : 'success');
+                    }
+                    
+                    if (sgx) {
+                        const proxyLabel = sgx.proxy ? ' (PROXY)' : '';
+                        log(`✅ SGX Nifty: ${sgx.last}${proxyLabel}`, sgx.proxy ? 'warn' : 'success');
+                    }
+                    
+                    if (gift && sgx) {
+                        addTestResult('GIFT/SGX Nifty', gift.proxy || sgx.proxy ? 'pending' : 'pass');
+                    } else {
+                        addTestResult('GIFT/SGX Nifty', 'fail');
+                    }
+                } else {
+                    log(`❌ Global cues data missing`, 'error');
+                    addTestResult('GIFT/SGX Nifty', 'fail');
+                }
+            } catch (error) {
+                log(`❌ Global cues test failed: ${error.message}`, 'error');
+                addTestResult('GIFT/SGX Nifty', 'fail');
+            }
+        }
+
+        async function runAllTests() {
+            log('🚀 Starting comprehensive test suite...', 'info');
+            log('═'.repeat(60), 'info');
+            
+            testResults = [];
+            updateResults();
+            
+            // Test 1: Backend Connection
+            const backendOk = await testBackendConnection();
+            if (!backendOk) {
+                log('❌ Backend not available - stopping tests', 'error');
+                return;
+            }
+            
+            log('═'.repeat(60), 'info');
+            
+            // Test 2: NIFTY API
+            await testNiftyAPI();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            log('═'.repeat(60), 'info');
+            
+            // Test 3: Price Calculation
+            await testPriceCalculation();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            log('═'.repeat(60), 'info');
+            
+            // Test 4: Global Cues
+            await testGlobalCues();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            log('═'.repeat(60), 'info');
+            
+            // Test 5: ML Predictions
+            await testMLPredictions();
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            log('═'.repeat(60), 'info');
+            
+            // Test 6: Stock API
+            await testStockAPI();
+            
+            log('═'.repeat(60), 'info');
+            log('✅ All tests completed!', 'success');
+            
+            const passCount = testResults.filter(t => t.status === 'pass').length;
+            const totalCount = testResults.length;
+            log(`📊 Results: ${passCount}/${totalCount} tests passed`, passCount === totalCount ? 'success' : 'warn');
+        }
+
+        // Initialize
+        window.addEventListener('DOMContentLoaded', () => {
+            log('🔧 Verification dashboard loaded', 'success');
+            log('Click "Run All Tests" to verify all fixes', 'info');
+        });
+    </script>
+</body>
+</html>

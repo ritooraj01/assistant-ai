@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>API Connection Test</h1>
+    <div id="status">Testing...</div>
+    <div id="result"></div>
+    <button onclick="testAPI()">Test API Again</button>
+
+    <script>
+        async function testAPI() {
+            const statusEl = document.getElementById('status');
+            const resultEl = document.getElementById('result');
+            
+            statusEl.innerText = 'Testing connection...';
+            resultEl.innerText = '';
+            
+            try {
+                console.log('Fetching from: http://127.0.0.1:8000/api/health');
+                
+                const startTime = Date.now();
+                const response = await fetch('http://127.0.0.1:8000/api/health');
+                const endTime = Date.now();
+                
+                console.log('Response status:', response.status);
+                console.log('Response time:', endTime - startTime, 'ms');
+                
+                const data = await response.json();
+                
+                statusEl.innerText = `✅ Success! (${endTime - startTime}ms)`;
+                statusEl.style.color = 'green';
+                resultEl.innerText = JSON.stringify(data, null, 2);
+                
+                // Now test the main endpoint
+                console.log('Testing signal_live endpoint...');
+                const signalStart = Date.now();
+                const signalResponse = await fetch('http://127.0.0.1:8000/api/signal_live?symbol=NIFTY&interval=3&limit=100');
+                const signalEnd = Date.now();
+                
+                console.log('Signal response status:', signalResponse.status);
+                console.log('Signal response time:', signalEnd - signalStart, 'ms');
+                
+                if (signalResponse.ok) {
+                    const signalData = await signalResponse.json();
+                    statusEl.innerText = `✅ Both endpoints working! Health: ${endTime - startTime}ms, Signal: ${signalEnd - signalStart}ms`;
+                    resultEl.innerText = `Price: ${signalData.price}\nHas final: ${!!signalData.final}\nHas global: ${!!signalData.global}`;
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                statusEl.innerText = '❌ Error!';
+                statusEl.style.color = 'red';
+                resultEl.innerText = error.message + '\n\n' + error.stack;
+            }
+        }
+        
+        // Auto-test on load
+        window.addEventListener('load', testAPI);
+    </script>
+</body>
+</html>

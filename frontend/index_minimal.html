@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Assistant</title>
+    <link rel="stylesheet" href="styles_minimal.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    
+    <!-- HEADER -->
+    <header>
+        <h1>📊 Trading Assistant</h1>
+        <select id="symbolSelect">
+            <option value="NIFTY">NIFTY</option>
+            <option value="BANKNIFTY">BANKNIFTY</option>
+        </select>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="container">
+
+        <!-- BIG SIGNAL CARD -->
+        <div id="signalCard" class="signal-card">
+            <div class="signal-action" id="signalAction">WAIT</div>
+            <div class="signal-confidence" id="signalConfidence">Confidence: --</div>
+            <div class="signal-ml" id="signalML">ML Trend: --</div>
+            <ul class="signal-reasons" id="signalReasons">
+                <li>Analyzing...</li>
+            </ul>
+        </div>
+
+        <!-- PRICE + SPARKLINE -->
+        <div class="price-section">
+            <div class="price-info">
+                <div class="price-value" id="priceValue">Loading...</div>
+                <div class="price-trend" id="priceTrend">--</div>
+            </div>
+            <div class="sparkline-container">
+                <canvas id="sparklineChart"></canvas>
+            </div>
+        </div>
+
+        <!-- MARKET SUMMARY GRID -->
+        <div class="market-grid">
+            <div class="market-box">
+                <div class="market-label">Market Mood</div>
+                <div class="market-value" id="marketMood">--</div>
+            </div>
+            <div class="market-box">
+                <div class="market-label">Sector Mood</div>
+                <div class="market-value" id="sectorMood">--</div>
+            </div>
+            <div class="market-box">
+                <div class="market-label">News Sentiment</div>
+                <div class="market-value" id="newsSentiment">--</div>
+            </div>
+            <div class="market-box">
+                <div class="market-label">India VIX</div>
+                <div class="market-value" id="vixValue">--</div>
+            </div>
+        </div>
+
+        <!-- OPTIONS SUMMARY -->
+        <div class="options-card">
+            <h3>Options Signal</h3>
+            <div class="options-grid">
+                <div class="option-item">
+                    <span class="option-label">Action:</span>
+                    <span class="option-value" id="optAction">--</span>
+                </div>
+                <div class="option-item">
+                    <span class="option-label">Strike:</span>
+                    <span class="option-value" id="optStrike">--</span>
+                </div>
+                <div class="option-item">
+                    <span class="option-label">IV:</span>
+                    <span class="option-value" id="optIV">--</span>
+                </div>
+                <div class="option-item">
+                    <span class="option-label">OI Sentiment:</span>
+                    <span class="option-value" id="optOI">--</span>
+                </div>
+                <div class="option-item">
+                    <span class="option-label">Greeks:</span>
+                    <span class="option-value" id="optGreeks">--</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- NEWS HEADLINES -->
+        <div class="news-card">
+            <h3>📰 Top Headlines</h3>
+            <ul id="newsList">
+                <li>Loading news...</li>
+            </ul>
+        </div>
+
+    </main>
+
+    <script src="script_minimal.js"></script>
+</body>
+</html>

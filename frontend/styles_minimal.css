@@ -1,0 +1,317 @@
+/* ========================================
+   MINIMAL TRADING ASSISTANT - DARK THEME
+   ======================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    background: #121212;
+    color: #ffffff;
+    line-height: 1.6;
+}
+
+/* HEADER */
+header {
+    background: #1e1e1e;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #2a2a2a;
+}
+
+header h1 {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+#symbolSelect {
+    padding: 0.5rem 1rem;
+    background: #2a2a2a;
+    border: 1px solid #3a3a3a;
+    color: #ffffff;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+#symbolSelect:focus {
+    outline: none;
+    border-color: #00c853;
+}
+
+/* CONTAINER */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1.5rem;
+}
+
+/* BIG SIGNAL CARD */
+.signal-card {
+    background: #1e1e1e;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.signal-card.buy {
+    border-color: #00c853;
+    background: linear-gradient(135deg, #1e1e1e 0%, #0d3d1f 100%);
+}
+
+.signal-card.sell {
+    border-color: #ff1744;
+    background: linear-gradient(135deg, #1e1e1e 0%, #3d0d1f 100%);
+}
+
+.signal-card.wait {
+    border-color: #ffea00;
+    background: linear-gradient(135deg, #1e1e1e 0%, #3d3d0d 100%);
+}
+
+.signal-action {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.signal-card.buy .signal-action {
+    color: #00c853;
+}
+
+.signal-card.sell .signal-action {
+    color: #ff1744;
+}
+
+.signal-card.wait .signal-action {
+    color: #ffea00;
+}
+
+.signal-confidence {
+    font-size: 1.2rem;
+    color: #aaaaaa;
+    margin-bottom: 0.5rem;
+}
+
+.signal-ml {
+    font-size: 1rem;
+    color: #888888;
+    margin-bottom: 1rem;
+    font-style: italic;
+}
+
+.signal-reasons {
+    list-style: none;
+    text-align: left;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.signal-reasons li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #2a2a2a;
+    color: #cccccc;
+}
+
+.signal-reasons li:last-child {
+    border-bottom: none;
+}
+
+/* PRICE SECTION */
+.price-section {
+    background: #1e1e1e;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.price-info {
+    flex: 1;
+}
+
+.price-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 0.25rem;
+}
+
+.price-trend {
+    font-size: 1rem;
+    color: #888888;
+}
+
+.price-trend.up {
+    color: #00c853;
+}
+
+.price-trend.down {
+    color: #ff1744;
+}
+
+.sparkline-container {
+    flex: 1;
+    height: 100px;
+}
+
+#sparklineChart {
+    max-height: 100px;
+}
+
+/* MARKET SUMMARY GRID */
+.market-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.market-box {
+    background: #1e1e1e;
+    border-radius: 8px;
+    padding: 1rem;
+    text-align: center;
+}
+
+.market-label {
+    font-size: 0.85rem;
+    color: #888888;
+    margin-bottom: 0.5rem;
+}
+
+.market-value {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+/* OPTIONS CARD */
+.options-card {
+    background: #1e1e1e;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.options-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: #ffffff;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.option-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.75rem;
+    background: #2a2a2a;
+    border-radius: 6px;
+}
+
+.option-label {
+    color: #888888;
+    font-size: 0.9rem;
+}
+
+.option-value {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/* NEWS CARD */
+.news-card {
+    background: #1e1e1e;
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.news-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: #ffffff;
+}
+
+#newsList {
+    list-style: none;
+}
+
+#newsList li {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #2a2a2a;
+    color: #cccccc;
+    font-size: 0.95rem;
+}
+
+#newsList li:last-child {
+    border-bottom: none;
+}
+
+/* MOBILE RESPONSIVE */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 1.2rem;
+    }
+
+    .container {
+        padding: 1rem;
+    }
+
+    .signal-card {
+        padding: 1.5rem;
+    }
+
+    .signal-action {
+        font-size: 2rem;
+    }
+
+    .price-section {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .sparkline-container {
+        height: 80px;
+    }
+
+    .market-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+
+    .options-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .price-value {
+        font-size: 1.5rem;
+    }
+
+    .market-box {
+        padding: 0.75rem;
+    }
+
+    .market-value {
+        font-size: 1rem;
+    }
+}

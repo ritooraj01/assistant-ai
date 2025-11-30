@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart Test</title>
+    <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        #testChart {
+            width: 100%;
+            height: 500px;
+            background: #0f0f0f;
+            border: 3px solid #00ff00;
+        }
+        .info {
+            margin: 20px 0;
+            padding: 10px;
+            background: #1a1a1a;
+            border-left: 4px solid #667eea;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Lightweight Charts Test Page</h1>
+    <div class="info" id="status">Initializing...</div>
+    <div id="testChart"></div>
+    
+    <script>
+        console.log('🚀 Test page loading...');
+        console.log('LightweightCharts available:', typeof LightweightCharts !== 'undefined');
+        
+        const statusDiv = document.getElementById('status');
+        const container = document.getElementById('testChart');
+        
+        statusDiv.innerHTML = `
+            <strong>Status Check:</strong><br>
+            ✓ Container exists: ${!!container}<br>
+            ✓ Container width: ${container.clientWidth}px<br>
+            ✓ Container height: ${container.clientHeight}px<br>
+            ✓ LightweightCharts loaded: ${typeof LightweightCharts !== 'undefined'}<br>
+            <br>
+            <strong>Fetching data...</strong>
+        `;
+        
+        // Create chart
+        const chart = LightweightCharts.createChart(container, {
+            width: container.clientWidth,
+            height: 500,
+            layout: {
+                background: { color: '#0f0f0f' },
+                textColor: '#888'
+            },
+            grid: {
+                vertLines: { color: '#1a1a1a' },
+                horzLines: { color: '#1a1a1a' }
+            },
+            timeScale: {
+                timeVisible: true,
+                secondsVisible: false
+            }
+        });
+        
+        const candleSeries = chart.addCandlestickSeries({
+            upColor: '#26a69a',
+            downColor: '#ef5350',
+            borderVisible: false,
+            wickUpColor: '#26a69a',
+            wickDownColor: '#ef5350'
+        });
+        
+        console.log('✅ Chart created, fetching data from API...');
+        
+        // Fetch data from API
+        fetch('http://127.0.0.1:8000/api/history?symbol=NIFTY&interval=5&limit=200')
+            .then(res => res.json())
+            .then(data => {
+                console.log('✅ Data received:', data.candles.length, 'candles');
+                console.log('First candle:', data.candles[0]);
+                console.log('Last candle:', data.candles[data.candles.length - 1]);
+                
+                candleSeries.setData(data.candles);
+                chart.timeScale().fitContent();
+                
+                statusDiv.innerHTML = `
+                    <strong>✅ SUCCESS!</strong><br>
+                    Chart created and loaded with ${data.candles.length} candles<br>
+                    Symbol: ${data.symbol}<br>
+                    Interval: ${data.interval}m<br>
+                    First candle time: ${new Date(data.candles[0].time * 1000).toLocaleString()}<br>
+                    Last candle time: ${new Date(data.candles[data.candles.length - 1].time * 1000).toLocaleString()}<br>
+                    <br>
+                    <strong>If you see green/red candles below, the chart is working!</strong>
+                `;
+                
+                console.log('✅ Chart displayed successfully!');
+            })
+            .catch(err => {
+                console.error('❌ Error:', err);
+                statusDiv.innerHTML = `<strong>❌ ERROR:</strong><br>${err.message}`;
+            });
+            
+        // Responsive resize
+        window.addEventListener('resize', () => {
+            chart.applyOptions({
+                width: container.clientWidth
+            });
+        });
+    </script>
+</body>
+</html>
