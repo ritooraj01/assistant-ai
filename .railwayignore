@@ -1,0 +1,22 @@
+# Exclude frontend and documentation
+frontend/
+docs/
+.vs/
+data/
+
+# Markdown documentation
+*.md
+!backend/README.md
+
+# Test files
+test_*.py
+*.pyc
+__pycache__/
+
+# Git files
+.git/
+.gitignore
+
+# Docker files (not needed on Railway)
+docker-compose.yml
+Dockerfile

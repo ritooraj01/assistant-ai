@@ -34,28 +34,61 @@ docker-compose down
 
 ---
 
-### Option 2: Railway (Backend)
+### Option 2: Railway (Backend) - India Region
 
 **Prerequisites:**
-- Railway account
-- GitHub repository
+- Railway account (sign up at railway.app)
+- Git installed
+- GitHub account
 
 **Steps:**
-1. Fork/push code to GitHub
-2. Go to [railway.app](https://railway.app)
-3. Click "New Project" → "Deploy from GitHub"
-4. Select your repository
-5. Set root directory: `/backend`
-6. Add environment variables (if needed):
+
+1. **Initialize Git and Push to GitHub:**
+   ```bash
+   cd d:\App
+   git init
+   git add .
+   git commit -m "Initial commit"
+   gh repo create trading-dashboard --public --source=. --push
+   # Or manually create repo on GitHub and push
    ```
-   PORT=8000
-   HOST=0.0.0.0
+
+2. **Deploy to Railway:**
+   - Go to [railway.app](https://railway.app) and sign in
+   - Click "New Project" → "Deploy from GitHub"
+   - Select your `trading-dashboard` repository
+   - Railway will automatically detect the configuration files:
+     - `railway.json` - Deployment config
+     - `Procfile` - Start command
+     - `nixpacks.toml` - Build configuration
+     - `start.sh` - Startup script
+
+3. **Configure Region (India/Mumbai):**
+   - After deployment, go to Settings → Region
+   - Select **Asia Pacific (Mumbai) - ap-south-1** for India
+   - Railway will redeploy automatically
+
+4. **Environment Variables (Optional):**
+   - Go to Variables tab
+   - Add if needed:
+     ```
+     PYTHONUNBUFFERED=1
+     ```
+
+5. **Get Your API URL:**
+   - Go to Settings → Domains
+   - Click "Generate Domain"
+   - Copy the URL (e.g., `https://your-app.up.railway.app`)
+
+6. **Update Frontend:**
+   Edit `frontend/script.js` line 1:
+   ```javascript
+   const API_BASE = 'https://your-app.up.railway.app';
    ```
-7. Railway will auto-deploy on push
 
 **Custom Domain:**
-- Settings → Generate Domain
-- Or add custom domain
+- Settings → Domains → Add Custom Domain
+- Point your DNS to Railway's endpoint
 
 ---
 
